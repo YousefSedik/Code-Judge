@@ -1,0 +1,13 @@
+# setup services 
+version: '3.9'
+
+services:
+  fastapi-server:
+    container_name: code-judge
+    build: .
+    privileged: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
