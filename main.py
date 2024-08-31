@@ -17,9 +17,11 @@ import uvicorn
 app = FastAPI()
 
 
-app.include_router(auth_router, prefix="/auth")
-app.include_router(problem_router, prefix="")
-app.include_router(submit_router, prefix="")
+app.include_router(
+    auth_router, prefix="/auth", tags=["user authentication and registration"]
+)
+app.include_router(problem_router, prefix="", tags=["add or get problems"])
+app.include_router(submit_router, prefix="", tags=["submit or get a solution"])
 
 
 if __name__ == "__main__":

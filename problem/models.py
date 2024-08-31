@@ -14,8 +14,8 @@ class Problem(SQLModel, table=True):
     title: str = Field(nullable=False)
     statement: str = Field(nullable=False)
     tutorial: Optional[str] = None
-    time_limit: Optional[int] = SmallInteger()  # in seconds
-    memory_limit: Optional[int] = SmallInteger()  # in MB
+    time_limit: Optional[float]  # in seconds
+    memory_limit: Optional[int]  # in MB
     test_cases: Optional[List["TestCase"]] = Relationship(back_populates="problem")
 
 
