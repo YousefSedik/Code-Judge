@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, responses
 from auth.router import router as auth_router
 from problem.router import router as problem_router
 from submit.router import router as submit_router
 from db import init_db
 import uvicorn
+import os
 
 # from contextlib import asynccontextmanager
 
@@ -22,6 +23,11 @@ app.include_router(
 )
 app.include_router(problem_router, prefix="", tags=["add or get problems"])
 app.include_router(submit_router, prefix="", tags=["submit or get a solution"])
+
+
+@app.get("/")
+async def root():
+    return responses.RedirectResponse(url="/docs")
 
 
 if __name__ == "__main__":
