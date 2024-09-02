@@ -2,9 +2,7 @@ from fastapi import FastAPI, responses
 from auth.router import router as auth_router
 from problem.router import router as problem_router
 from submit.router import router as submit_router
-from db import init_db
 import uvicorn
-import os
 
 # from contextlib import asynccontextmanager
 

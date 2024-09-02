@@ -4,14 +4,14 @@ services:
   fastapi-server:
     build: .
     container_name: code-judge
-    privileged: true
+    # privileged: true
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/codejudge
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --workers 4
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload 
     depends_on:
       - db
   

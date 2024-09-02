@@ -1,7 +1,8 @@
-from sqlmodel import Field, SQLModel, Relationship, SmallInteger
+from sqlmodel import Field, SQLModel, Relationship
 from typing import Optional, List
 from enum import Enum
 import os
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,7 +30,6 @@ class TestCase(SQLModel, table=True):
 
     @property
     def input_path(self):
-        print("Ids Value: ", self.id)
         return os.path.join(
             BASE_DIR,
             f"problem_test_cases/{self.problem.id}/input-{self.id}.txt",
@@ -44,3 +44,20 @@ class TestCase(SQLModel, table=True):
 
     def __str__(self):
         return f"Test case {self.id}"
+
+
+class PROBLEM_REQUEST_STATUS(str, Enum):
+    PENDING = "Pending"
+    ACCEPTED = "Accepted"
+    FAILED = "Failed"
+
+
+class CSESProblemRequest(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    status: PROBLEM_REQUEST_STATUS = Field(
+        nullable=False, default=PROBLEM_REQUEST_STATUS.PENDING
+    )
+    problem_id: Optional[int] = Field(foreign_key="problem.id", nullable=True)
+    cses_problem_id: int
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    error_msg: Optional[str] = None
