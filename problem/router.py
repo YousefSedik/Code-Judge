@@ -2,7 +2,7 @@ from problem.schemas import ManualProblemAdd, CSESProblemAdd
 from sqlalchemy.ext.asyncio import AsyncSession
 from problem.models import Problem, PROBLEM_SOURCE, CSESProblemRequest
 from fastapi import Depends, HTTPException, BackgroundTasks
-from problem.utils import add_test_files, add_cses_problem
+from problem.utils import add_cses_problem, WriteTestCases
 from fastapi.routing import APIRouter
 from dotenv import load_dotenv
 from sqlmodel import select
@@ -42,12 +42,13 @@ async def create_problem_manual(
 
     session.add(problem)
     await session.flush()
-    await add_test_files(
-        problem,
-        session,
+    write_tests = WriteTestCases(
         ManualProblemForm.input_test,
         ManualProblemForm.output_test,
+        problem,
+        session,
     )
+    await write_tests.write_io_tests()
     await session.commit()
 
     return {"message": "Problem created successfully", "problem_id": problem.id}

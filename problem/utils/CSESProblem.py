@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from requests import Session
+from pylatexenc.latex2text import LatexNodes2Text
 
 # from zipfile import ZipFile
 from lxml import etree
@@ -39,7 +40,9 @@ class CSESProblem:
         self.memory_limit = self.__problem_dom.xpath(self.__memory_limit_xpath)[
             0
         ].split(" ")[1]
-        self.statement = self.__problem_dom.xpath(self.__statement_xpath)[0].text
+        self.statement = LatexNodes2Text().latex_to_text(
+            latex=self.__problem_response_bs4.find("div", {"class": "md"}).text
+        )
 
     def __get_tests(self):
         problem_id = self.__problem_id

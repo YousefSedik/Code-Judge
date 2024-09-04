@@ -3,23 +3,26 @@ import os
 
 
 class ReadTestCases:
-    def __init__(self, problem_id):
+    def __init__(self, problem_id, zip_file_name=None):
+        if zip_file_name is None:
+            zip_file_name = f"{problem_id}"
+
+        self.zip_file_name = zip_file_name
         self.problem_id = problem_id
 
     def read_io_tests(self):
-        problem_id = self.problem_id
         input_tests = []
         output_tests = []
-        with ZipFile(f"{problem_id}.zip", "r") as zip_ref:
-            zip_ref.extractall(f"{problem_id}")
-            tests = os.listdir(f"{problem_id}")
+        with ZipFile(f"{self.zip_file_name}.zip", "r") as zip_ref:
+            zip_ref.extractall(f"{self.zip_file_name}")
+            tests = os.listdir(f"{self.zip_file_name}")
             test_count = len(tests) // 2
             for i in range(test_count):
-                input_tests.append(open(f"{problem_id}/{i + 1}.in").read())
-                output_tests.append(open(f"{problem_id}/{i + 1}.out").read())
+                input_tests.append(open(f"{self.zip_file_name}/{i + 1}.in").read())
+                output_tests.append(open(f"{self.zip_file_name}/{i + 1}.out").read())
 
-            os.remove(f"{problem_id}.zip")
-            self.rmdir(f"{problem_id}")
+            os.remove(f"{self.zip_file_name}.zip")
+            self.rmdir(f"{self.zip_file_name}")
         return input_tests, output_tests
 
     @staticmethod

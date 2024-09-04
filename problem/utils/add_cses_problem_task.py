@@ -7,7 +7,6 @@ from problem.models import (
     PROBLEM_SOURCE,
 )
 from sqlmodel import update, select
-from problem.utils import add_test_files
 from problem.utils.WriteTests import WriteTestCases
 
 
@@ -50,7 +49,6 @@ async def add_cses_problem(
         await session.commit()
 
     except Exception as e:
-        print(e)
         await session.rollback()
 
         await session.execute(
