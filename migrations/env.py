@@ -8,11 +8,9 @@ from sqlmodel import SQLModel
 from alembic import context
 from auth.models import User
 from problem.models import Problem, TestCase
+from submit.models import Submission
 from pathlib import Path
 import os
-
-# from problem.models import *
-# from submit.models import *
 
 
 # this is the Alembic Config object, which provides
