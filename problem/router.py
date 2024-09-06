@@ -73,7 +73,7 @@ async def create_problem_cses(
             status_code=500, detail="PHPSESSID environment variable not set"
         )
     background_tasks.add_task(
-        add_cses_problem, cses_problem_id, problem_request.id, PHPSESSID, session
+        add_cses_problem, cses_problem_id, problem_request.id, PHPSESSID
     )
 
     return {"request_id": problem_request.id}

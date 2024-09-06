@@ -1,4 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from problem.utils import CSESProblem
 from problem.models import (
     CSESProblemRequest,
@@ -8,11 +7,11 @@ from problem.models import (
 )
 from sqlmodel import update, select
 from problem.utils.WriteTests import WriteTestCases
+from db import SessionLocal
 
 
-async def add_cses_problem(
-    cses_problem_id: int, request_id: int, PHPSESSID: str, session: AsyncSession
-):
+async def add_cses_problem(cses_problem_id: int, request_id: int, PHPSESSID: str):
+    session = SessionLocal()
     try:
         already_exists = await session.execute(
             select(CSESProblemRequest).where(
@@ -57,3 +56,5 @@ async def add_cses_problem(
             .values(status=PROBLEM_REQUEST_STATUS.FAILED, error_msg=str(e))
         )
         await session.commit()
+    finally:
+        session.close()
