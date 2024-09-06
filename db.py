@@ -23,3 +23,6 @@ async def get_session() -> AsyncSession:
     )
     async with async_session() as session:
         yield session
+
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
