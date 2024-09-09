@@ -1,6 +1,5 @@
 from pydantic import BaseModel, field_validator
 from submit.models import SUBMISSION_LANGUAGE
-from db import SessionLocal
 from problem.models import Problem
 from sqlmodel import select
 

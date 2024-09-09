@@ -1,9 +1,10 @@
 from sqlmodel import Field, SQLModel, Relationship
+from problem.models import Problem
 from typing import Optional, List
+from datetime import datetime
+from sqlalchemy import event
 from enum import Enum
 import os
-from datetime import datetime
-from problem.models import Problem
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -48,8 +49,23 @@ class Submission(SQLModel, table=True):
 
         return os.path.join(
             BASE_DIR,
-            f"submit/submissions/{self.id}/source_code.{file_extension}",
+            f"submissions/{self.id}/source_code.{file_extension}",
         )
 
     def __str__(self):
         return f"Submission {self.id} by {self.user.username} for {self.problem.title}"
+
+
+def after_save(mapper, connection, target):
+    path = target.source_code_path
+    print("-" * 50)
+    print(f"Saving source code to {path}")
+    print("-" * 50)
+    os.makedirs(os.path.join(BASE_DIR, f"submissions/{target.id}"), exist_ok=True)
+    # create a file with the source code
+    os.system(f"touch {path}")
+    with open(path, "w") as file:
+        file.write(target.source_code)
+
+
+event.listen(Submission, "after_insert", after_save)
