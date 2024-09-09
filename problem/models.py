@@ -3,6 +3,7 @@ from typing import Optional, List
 from enum import Enum
 import os
 from datetime import datetime
+from sqlmodel import Relationship
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -20,12 +21,13 @@ class Problem(SQLModel, table=True):
     tutorial: Optional[str] = None
     time_limit: Optional[float]  # in seconds
     memory_limit: Optional[int]  # in MB
-    test_cases: Optional[List["TestCase"]] = Relationship(back_populates="problem")
+    test_cases: List["TestCase"] = Relationship(back_populates="problem")
+    submissions: Optional[List["Submission"]] = Relationship(back_populates="problem")
 
 
 class TestCase(SQLModel, table=True):
     id: int = Field(primary_key=True)
-    problem_id: int = Field(foreign_key="problem.id", nullable=False)
+    problem_id: Optional[int] = Field(foreign_key="problem.id", nullable=False)
     problem: Problem = Relationship(back_populates="test_cases")
 
     @property

@@ -4,7 +4,6 @@ from enum import Enum
 import os
 from datetime import datetime
 from problem.models import Problem
-from auth.models import User
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,7 +25,8 @@ class SUBMISSION_VERDICT(str, Enum):
 class Submission(SQLModel, table=True):
     id: int = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.id")
-    user: User = Relationship(back_populates="submissions")
+    user: "User" = Relationship(back_populates="submissions")
+
     problem_id: int = Field(foreign_key="problem.id", nullable=False)
     problem: Problem = Relationship(back_populates="submissions")
     submission_language: SUBMISSION_LANGUAGE = Field(nullable=False)

@@ -8,6 +8,9 @@ from auth.models import User
 from jose import JWTError, jwt
 from sqlmodel import select
 import os
+from dotenv import load_dotenv
+
+load_dotenv("../.env")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")

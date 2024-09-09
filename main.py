@@ -2,7 +2,8 @@ from fastapi import FastAPI, responses
 from auth.router import router as auth_router
 from problem.router import router as problem_router
 from submit.router import router as submit_router
-import uvicorn
+
+# import uvicorn
 
 # from contextlib import asynccontextmanager
 
@@ -28,6 +29,4 @@ async def root():
     return responses.RedirectResponse(url="/docs")
 
 
-if __name__ == "__main__":
-
-    uvicorn.run(app)
+# if __name__ == "__main__":
