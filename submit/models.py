@@ -58,9 +58,6 @@ class Submission(SQLModel, table=True):
 
 def after_save(mapper, connection, target):
     path = target.source_code_path
-    print("-" * 50)
-    print(f"Saving source code to {path}")
-    print("-" * 50)
     os.makedirs(os.path.join(BASE_DIR, f"submissions/{target.id}"), exist_ok=True)
     # create a file with the source code
     os.system(f"touch {path}")

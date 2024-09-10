@@ -5,3 +5,4 @@
 __pycache__
 .pytest_cache
 problem/problem_test_cases/*
+submit/submissions/*

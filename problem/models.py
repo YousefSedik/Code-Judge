@@ -34,14 +34,14 @@ class TestCase(SQLModel, table=True):
     def input_path(self):
         return os.path.join(
             BASE_DIR,
-            f"problem_test_cases/{self.problem.id}/input-{self.id}.txt",
+            f"problem_test_cases/{self.problem_id}/input-{self.id}.txt",
         )
 
     @property
     def output_path(self):
         return os.path.join(
             BASE_DIR,
-            f"problem_test_cases/{self.problem.id}/output-{self.id}.txt",
+            f"problem_test_cases/{self.problem_id}/output-{self.id}.txt",
         )
 
     def __str__(self):
