@@ -7,41 +7,66 @@ from submit.utils.code_test import test
 # from auth.schemas import Token
 # from auth.models import User
 from auth.utils import get_current_user
-from fastapi import BackgroundTasks
 from problem.models import Problem, TestCase
 from db import get_session
 from submit.schemas import SubmitForm
 from sqlmodel import select
-
+from fastapi.security import OAuth2PasswordBearer
+import threading
+import asyncio
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+def run_test(submission, problem):
+    asyncio.run(test(submission, problem))
 
 
 @router.post("/submit")
 async def submit(
-    token: str,
     SubmissionForm: SubmitForm,
-    background_tasks: BackgroundTasks,
+    token: str = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ):
 
     user = await get_current_user(session, token)
     problem = await session.get(Problem, SubmissionForm.problem_id)
-    print(problem.time_limit, problem.memory_limit)
 
     if problem is None:
         raise HTTPException(status_code=404, detail="Problem not found")
+    source_code = ""
+    for line in SubmissionForm.source_code:
+        source_code += line + "\n"
 
     submission = Submission(
         user_id=user.id,
         problem_id=SubmissionForm.problem_id,
         submission_language=SubmissionForm.submission_language,
-        source_code=SubmissionForm.source_code,
+        source_code=source_code,
     )
 
     session.add(submission)
     await session.commit()
     await session.refresh(submission)
-
-    background_tasks.add_task(test, submission, problem)
-
+    
+    thread = threading.Thread(target=run_test, args=(submission, problem))
+    thread.start()
     return {"message": "Submission received", "submission_id": submission.id}
+
+
+@router.get("/submission/{submission_id}")
+async def get_submission(
+    submission_id: int, session: AsyncSession = Depends(get_session)
+):
+    submission = await session.get(Submission, submission_id)
+    if submission is None:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    return {
+        "id": submission.id,
+        "problem_id": submission.problem_id,
+        "submission_language": submission.submission_language,
+        "source_code": submission.source_code.split("\n"),
+        "verdict": submission.verdict,
+        "created_at": submission.created_at,
+        "user_id": submission.user_id,
+    }

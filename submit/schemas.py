@@ -5,6 +5,6 @@ from sqlmodel import select
 
 
 class SubmitForm(BaseModel):
-    source_code: str
+    source_code: list[str]
     submission_language: SUBMISSION_LANGUAGE
     problem_id: int

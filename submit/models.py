@@ -18,6 +18,7 @@ class SUBMISSION_VERDICT(str, Enum):
     AC = "Accepted"
     WA = "Wrong Answer"
     TLE = "Time Limit Exceeded"
+    MEME = "Memory Limit Exceeded"
     RE = "Runtime Error"
     CE = "Compilation Error"
     PI = "Pending"

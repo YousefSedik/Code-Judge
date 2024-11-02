@@ -4,7 +4,7 @@ services:
   fastapi-server:
     build: .
     container_name: code-judge
-    # privileged: true
+    privileged: true
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/codejudge
     ports:

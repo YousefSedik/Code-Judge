@@ -10,10 +10,8 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # 3: update kernel + install dependencies
 RUN apt-get update && \
-    apt-get install -y gcc libpq-dev  bubblewrap  && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+    apt-get install -y g++ libpq-dev  bubblewrap  && \
+    apt-get clean
 
 
 # 4: create project folder: kernel
