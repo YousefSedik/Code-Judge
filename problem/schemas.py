@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 from typing import Optional, List
 from fastapi import HTTPException
 
@@ -12,7 +12,7 @@ class ManualProblemAdd(BaseModel):
     input_test: List[str]
     output_test: List[str]
 
-    @validator("output_test")
+    @field_validator("output_test")
     def check_tests_length(cls, v, values):
         if "input_test" in values and len(values["input_test"]) != len(v):
             raise HTTPException(

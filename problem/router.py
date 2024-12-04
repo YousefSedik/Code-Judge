@@ -2,7 +2,8 @@ from problem.schemas import ManualProblemAdd, CSESProblemAdd
 from sqlalchemy.ext.asyncio import AsyncSession
 from problem.models import Problem, PROBLEM_SOURCE, CSESProblemRequest
 from fastapi import Depends, HTTPException, BackgroundTasks
-from problem.utils import add_cses_problem, WriteTestCases
+from problem.utils import WriteTestCases
+from problem.tasks import add_cses_problem_task
 from fastapi.routing import APIRouter
 from dotenv import load_dotenv
 from sqlmodel import select
@@ -16,9 +17,7 @@ load_dotenv(".env")
 
 @router.get("/problem/{problem_id}")
 async def get_problem(problem_id: int, session: AsyncSession = Depends(get_session)):
-    problem_info = await session.execute(
-        select(Problem).where(Problem.id == problem_id)
-    )
+    problem_info = await session.execute(select(Problem).where(Problem.id == problem_id))
     problem_info = problem_info.scalars().first()
 
     if problem_info is None:
@@ -72,9 +71,10 @@ async def create_problem_cses(
         raise HTTPException(
             status_code=500, detail="PHPSESSID environment variable not set"
         )
-    background_tasks.add_task(
-        add_cses_problem, cses_problem_id, problem_request.id, PHPSESSID
-    )
+    add_cses_problem_task.delay(cses_problem_id, problem_request.id, PHPSESSID)
+    # background_tasks.add_task(
+    #     add_cses_problem, cses_problem_id, problem_request.id, PHPSESSID
+    # )
 
     return {"request_id": problem_request.id}
 

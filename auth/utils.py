@@ -10,7 +10,7 @@ from sqlmodel import select
 import os
 from dotenv import load_dotenv
 
-load_dotenv("../.env")
+load_dotenv(".env")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth_2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -27,7 +27,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def get_user(session, username: str):
+async def get_user(session: AsyncSession, username: str):
     result = await session.execute(select(User).where(User.username == username))
     user = result.scalar_one_or_none()
     return user
@@ -81,20 +81,18 @@ async def create_user(session: AsyncSession, user_data):
             status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match"
         )
     # Check if email exists
-    email_query = await session.execute(
-        select(User).where(User.email == user_data.email)
-    )
-    existing_email = email_query.scalar_one_or_none()
+    email_query = await session.execute(select(User).where(User.email == user_data.email))
+    existing_email = email_query.one_or_none()  # Fixed method
     if existing_email:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
         )
 
     # Check if username exists
     username_query = await session.execute(
         select(User).where(User.username == user_data.username)
     )
-    existing_username = username_query.scalar_one_or_none()
+    existing_username = username_query.one_or_none()
     if existing_username:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists"

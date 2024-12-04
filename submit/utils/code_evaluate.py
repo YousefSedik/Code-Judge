@@ -23,10 +23,13 @@ def compile_cpp(source_code_path: str) -> bool:
 
 # background task
 async def test(
-    submission: Submission,
-    problem: Problem,
+    submission_id: int,
+    problem_id: int,
 ):
+    print("Evaluation started")
     async with AsyncSessionLocal() as session:
+        problem: Problem = await session.get(Problem, problem_id)
+        submission: Submission = await session.get(Submission, submission_id)
         result: list[TestCase] = await session.execute(
             select(TestCase).where(TestCase.problem_id == problem.id)
         )
@@ -53,7 +56,7 @@ async def test(
                     ).evaluate()
                     if result != SUBMISSION_VERDICT.AC:
                         break
-                
+
                 if result != SUBMISSION_VERDICT.AC:
                     submission.verdict = result
                     session.add(submission)

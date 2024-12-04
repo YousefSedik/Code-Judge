@@ -2,24 +2,16 @@ from fastapi.routing import APIRouter
 from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from submit.models import Submission
-from submit.utils.code_test import test
-
-# from auth.schemas import Token
-# from auth.models import User
+from submit.utils.code_evaluate import test
 from auth.utils import get_current_user
 from problem.models import Problem, TestCase
 from db import get_session
 from submit.schemas import SubmitForm
 from sqlmodel import select
+from submit.tasks import task_code_task
 from fastapi.security import OAuth2PasswordBearer
-import threading
-import asyncio
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-def run_test(submission, problem):
-    asyncio.run(test(submission, problem))
 
 
 @router.post("/submit")
@@ -48,9 +40,7 @@ async def submit(
     session.add(submission)
     await session.commit()
     await session.refresh(submission)
-    
-    thread = threading.Thread(target=run_test, args=(submission, problem))
-    thread.start()
+    task_code_task.delay(submission.id, problem.id)
     return {"message": "Submission received", "submission_id": submission.id}
 
 

@@ -7,14 +7,17 @@ services:
     privileged: true
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/codejudge
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-    command: fastapi dev main.py --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - db
-  
+      - redis
+
   db:
     image: postgres:16
     environment:
@@ -34,3 +37,31 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "8080:80"
+
+  redis:
+    image: "redis:latest"
+
+  celery:
+    build: .
+    command: ["celery", "-A", "worker.celery", "worker", "--loglevel=info"]
+    depends_on:
+      - redis
+      - fastapi-server
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/codejudge
+
+
+  flower:
+    build: .
+    command: ["celery", "-A", "worker.celery", "flower", "--broker=redis://redis:6379/0"]
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/codejudge
+
+    depends_on:
+      - redis

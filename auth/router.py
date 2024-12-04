@@ -14,6 +14,7 @@ from auth.utils import (
 from db import get_session
 from auth.models import User
 from datetime import timedelta, datetime
+from fastapi.responses import JSONResponse
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +29,7 @@ async def register(
 ):
 
     await create_user(session, SignUpForm)
-    return {"created": True}
+    return JSONResponse(content={"created": True}, status_code=201)
 
 
 @router.post("/token", response_model=Token)
